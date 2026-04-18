@@ -34,7 +34,6 @@
             text-transform: uppercase;
         }
 
-        /* Minigame Overlay */
         #skill-check-overlay {
             display: none;
             position: fixed;
@@ -131,7 +130,6 @@
     </div>
 
     <script>
-        // Audio Setup
         const typingSnd = new Audio('Typing.mp3');
         typingSnd.loop = true;
         
@@ -152,7 +150,6 @@
         const targetZone = document.getElementById('target-zone');
         const uiBars = document.getElementById('ui-bars');
 
-        // Monitor activity for the Typing audio
         setInterval(() => {
             if (isGameOver || isMinigameActive) {
                 typingSnd.pause();
