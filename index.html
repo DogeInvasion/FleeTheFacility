@@ -191,7 +191,7 @@
 
             if (totalProgress >= 100) {
                 winGame();
-            } else if (sessionSeconds >= 0.05) {
+            } else if (sessionSeconds >= 60) {
                 startMinigame();
             }
         });
@@ -201,7 +201,7 @@
             typingSnd.pause();
             skillFailSnd.play();
             document.body.style.backgroundColor = "var(--fail-color)";
-            document.getElementById('game-container').innerHTML = "<h1>SYSTEM HALTED</h1>";
+            document.getElementById('game-container').innerHTML = "<h1></h1>";
             uiBars.classList.add('hidden');
             overlay.style.display = 'none';
         }
@@ -210,7 +210,7 @@
             isGameOver = true;
             typingSnd.pause();
             document.body.style.backgroundColor = "var(--win-color)";
-            document.getElementById('game-container').innerHTML = "<h1>HACK SUCCESSFUL</h1>";
+            document.getElementById('game-container').innerHTML = "<h1></h1>";
             uiBars.classList.add('hidden');
         }
 
