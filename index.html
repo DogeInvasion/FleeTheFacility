@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTF Hack - Anti-Hold Edition</title>
+    <title>FTF Hack - Audio Edition</title>
     <style>
         :root {
             --bg-color: #0055ff;
@@ -32,12 +32,6 @@
             font-weight: bold;
             margin-bottom: 10px;
             text-transform: uppercase;
-        }
-
-        #mash-counter {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #00ff00;
         }
 
         /* Minigame Overlay */
@@ -120,7 +114,6 @@
 
     <div id="game-container">
         <div id="status-display">CLICK TO HACK</div>
-        <div id="mash-counter">Active Clicks: 0</div>
     </div>
 
     <div id="skill-check-overlay">
@@ -133,7 +126,7 @@
 
     <div class="bars-container" id="ui-bars">
         <div>
-            <div class="label">Session Progress (MASH!)</div>
+            <div class="label">Session Progress</div>
             <div class="progress-wrapper"><div id="timer-fill"></div></div>
         </div>
         <div>
@@ -143,15 +136,21 @@
     </div>
 
     <script>
+        // Audio Setup
+        const typingSnd = new Audio('Typing.mp3');
+        typingSnd.loop = true;
+        
+        const skillStartSnd = new Audio('SkillStart.mp3');
+        const skillFailSnd = new Audio('SkillFail.mp3');
+
         let totalProgress = 0;
         let sessionSeconds = 0;
         let difficultyLevel = 0;
         let isMinigameActive = false;
         let isGameOver = false;
-        let activeClicks = 0;
+        let lastClickTime = 0;
 
         const statusDisplay = document.getElementById('status-display');
-        const mashCounter = document.getElementById('mash-counter');
         const totalFill = document.getElementById('total-progress-fill');
         const timerFill = document.getElementById('timer-fill');
         const overlay = document.getElementById('skill-check-overlay');
@@ -159,41 +158,48 @@
         const targetZone = document.getElementById('target-zone');
         const uiBars = document.getElementById('ui-bars');
 
-        // Logic to block "Holding" keys
+        // Monitor activity for the Typing audio
+        setInterval(() => {
+            if (isGameOver || isMinigameActive) {
+                typingSnd.pause();
+                return;
+            }
+
+            // If it's been more than 300ms since the last click, pause sound
+            if (Date.now() - lastClickTime > 300) {
+                typingSnd.pause();
+                // Slowly drain session
+                if (sessionSeconds > 0) {
+                    sessionSeconds -= 0.05;
+                    timerFill.style.width = (sessionSeconds / 8) * 100 + "%";
+                }
+            } else {
+                // If the user is active, play sound
+                if (typingSnd.paused) typingSnd.play().catch(()=>{});
+            }
+        }, 100);
+
         window.addEventListener('keydown', (e) => {
-            if (isMinigameActive || isGameOver) return;
+            if (isMinigameActive || isGameOver || e.repeat) return;
             
-            // e.repeat is TRUE if the key is being held down
-            if (e.repeat) return; 
+            lastClickTime = Date.now();
+            sessionSeconds += 0.25;
+            totalProgress += 0.2;
 
-            // If we get here, it's a fresh click
-            sessionSeconds += 0.25; // 4 clicks per second needed to fill in 8s
-            totalProgress += 0.07;
-            activeClicks++;
-
-            // Update UI
-            mashCounter.innerText = `Active Clicks: ${activeClicks}`;
             timerFill.style.width = Math.min((sessionSeconds / 8) * 100, 100) + "%";
             totalFill.style.width = Math.min(totalProgress, 100) + "%";
 
             if (totalProgress >= 100) {
                 winGame();
-            } else if (sessionSeconds >= 60) {
+            } else if (sessionSeconds >= 8) {
                 startMinigame();
             }
         });
 
-        // Slowly drain the session bar if you stop clicking
-        setInterval(() => {
-            if (isMinigameActive || isGameOver) return;
-            if (sessionSeconds > 0) {
-                sessionSeconds -= 0.05;
-                timerFill.style.width = Math.min((sessionSeconds / 8) * 100, 100) + "%";
-            }
-        }, 100);
-
         function failGame() {
             isGameOver = true;
+            typingSnd.pause();
+            skillFailSnd.play();
             document.body.style.backgroundColor = "var(--fail-color)";
             document.getElementById('game-container').innerHTML = "<h1>SYSTEM HALTED</h1>";
             uiBars.classList.add('hidden');
@@ -202,6 +208,7 @@
 
         function winGame() {
             isGameOver = true;
+            typingSnd.pause();
             document.body.style.backgroundColor = "var(--win-color)";
             document.getElementById('game-container').innerHTML = "<h1>HACK SUCCESSFUL</h1>";
             uiBars.classList.add('hidden');
@@ -223,6 +230,8 @@
         function startMinigame() {
             isMinigameActive = true;
             sessionSeconds = 0;
+            typingSnd.pause();
+            skillStartSnd.play();
             overlay.style.display = 'flex';
             
             let newWidth = Math.max(8, 80 - (difficultyLevel * 8));
