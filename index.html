@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTF Hack - Audio Edition</title>
+    <title>FTF Computer</title>
     <style>
         :root {
             --bg-color: #0055ff;
@@ -78,7 +78,7 @@
         #scanner-line {
             width: 8px;
             height: 100%;
-            background: black;
+            background: red;
             position: absolute;
             left: 0;
             z-index: 10;
@@ -104,7 +104,7 @@
         }
 
         #total-progress-fill { width: 0%; height: 100%; background: white; }
-        #timer-fill { width: 0%; height: 100%; background: #00ff00; }
+        #timer-fill { width: 0%; height: 100%; background: #fff; }
 
         .label { font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; text-align: left;}
         .hidden { display: none !important; }
@@ -113,7 +113,7 @@
 <body>
 
     <div id="game-container">
-        <div id="status-display">CLICK TO HACK</div>
+        <div id="status-display"></div>
     </div>
 
     <div id="skill-check-overlay">
@@ -126,11 +126,11 @@
 
     <div class="bars-container" id="ui-bars">
         <div>
-            <div class="label">Session Progress</div>
+            <div class="label"></div>
             <div class="progress-wrapper"><div id="timer-fill"></div></div>
         </div>
         <div>
-            <div class="label">Total System Hack</div>
+            <div class="label"></div>
             <div class="progress-wrapper"><div id="total-progress-fill"></div></div>
         </div>
     </div>
@@ -184,14 +184,14 @@
             
             lastClickTime = Date.now();
             sessionSeconds += 0.25;
-            totalProgress += 0.2;
+            totalProgress += 0.07;
 
             timerFill.style.width = Math.min((sessionSeconds / 8) * 100, 100) + "%";
             totalFill.style.width = Math.min(totalProgress, 100) + "%";
 
             if (totalProgress >= 100) {
                 winGame();
-            } else if (sessionSeconds >= 8) {
+            } else if (sessionSeconds >= 0.05) {
                 startMinigame();
             }
         });
@@ -268,7 +268,7 @@
 
             if (success) {
                 difficultyLevel++;
-                statusDisplay.innerText = "KEEP CLICKING!";
+                statusDisplay.innerText = "";
             } else {
                 failGame();
             }
