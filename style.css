@@ -19,7 +19,7 @@ body {
     /* Background tiling settings */
     background-image: var(--bg-gif);
     background-repeat: repeat;    /* This enables tiling */
-    background-size: auto;       /* Keeps original image size */
+    background-size: 100px;       /* Keeps original image size */
     background-position: top left;
     background-color: #000;
     
